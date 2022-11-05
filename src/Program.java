@@ -291,6 +291,8 @@ public class Program
 									{
 										System.out.println("Error Inserting Row: " + e.toString());
 									}
+									//Close PreparedStatement
+									pStmt.close();
 								}
 								catch(SQLException e)
 								{
@@ -298,7 +300,33 @@ public class Program
 								}
 							break;
 							case "8":
-								
+								//Open PreparedStatement
+								try(PreparedStatement pStmt = conn.prepareStatement("update BORROW set renewals_no = renewals_no + 1 where barcode = ? and date_borrowed in (select tOut from (select max(date_borrowed) as tOut from BORROW where card_no = ?) tRes)");)
+								{
+									try 
+									{
+										String helper;
+										//Take Input
+										System.out.println("What is the Card Number of the Member?");
+										validate = sc.next();
+										System.out.println("What is the Barcode of the Book being Renewed?");
+										helper = sc.next();
+										pStmt.setString(1, validate);
+										pStmt.setString(2, helper);
+										//Execute Update
+										pStmt.executeUpdate();
+									}
+									catch(SQLException e)
+									{
+										System.out.println("Error: " + e.toString());
+									}
+									//Close PreparedStatement
+									pStmt.close();
+								}
+								catch(SQLException e)
+								{
+									e.printStackTrace();
+								}
 							break;
 							case "9":
 								
