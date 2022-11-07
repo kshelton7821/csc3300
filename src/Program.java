@@ -80,7 +80,7 @@ public class Program
 										System.out.println("ISBN | Title | Genre | Date Published | Publisher | Edition Number | Description");
 										while(rset.next())
 										{
-											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getDate(4) + " | " + rset.getString(5) + " | " + rset.getInt(6) + " | " + rset.getString(7));
+											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getTime(4) + " | " + rset.getString(5) + " | " + rset.getInt(6) + " | " + rset.getString(7));
 										}
 										System.out.println();
 										System.out.println();
@@ -215,7 +215,7 @@ public class Program
 										System.out.println("ISBN | Title | Barcode | Date Borrowed | Renewals");
 										while(rset.next()) 
 										{
-											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getDate(4) + " | " + rset.getInt(5));
+											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getTime(4) + " | " + rset.getInt(5));
 										}
 										System.out.println();
 										System.out.println();
@@ -315,6 +315,9 @@ public class Program
 										pStmt.setString(2, helper);
 										//Execute Update
 										pStmt.executeUpdate();
+										System.out.println("Update Sent, Row will be Udpated if Information Matches");
+										System.out.println();
+										System.out.println();
 									}
 									catch(SQLException e)
 									{
@@ -329,10 +332,43 @@ public class Program
 								}
 							break;
 							case "9":
-								
+								//Simple 10
 							break;
 							case "10":
-								
+								//Open PreparedStatement
+								try(PreparedStatement pStmt = conn.prepareStatement("select sel.ISBN, sel.title, sel.barcode, sel.date_borrowed, sel.date_returned, sel.MoneyOwed from ((select BOOK.ISBN, BOOK.title, BORROW.barcode, BORROW.date_borrowed, BORROW.date_returned, (datediff(NOW(), BORROW.date_borrowed) - 14) * 0.25 as MoneyOwed from BOOK natural join COPY natural join BORROW natural join MEMBER where MEMBER.card_no = ? and (BORROW.paid = 0 or BORROW.paid is null) and BORROW.date_returned is null and BORROW.renewals_no = 0 and datediff(NOW(), BORROW.date_borrowed) > 14) union (select BOOK.ISBN, BOOK.title, BORROW.barcode, BORROW.date_borrowed, BORROW.date_returned, (datediff(NOW(), BORROW.date_borrowed) - 28) * 0.25 as MoneyOwed from BOOK natural join COPY natural join BORROW natural join MEMBER where MEMBER.card_no = ? and (BORROW.paid = 0 or BORROW.paid is null) and BORROW.date_returned is null and BORROW.renewals_no = 1 and datediff(NOW(), BORROW.date_borrowed) > 28) union (select BOOK.ISBN, BOOK.title, BORROW.barcode, BORROW.date_borrowed, BORROW.date_returned, (datediff(NOW(), BORROW.date_borrowed) - 42) * 0.25 as MoneyOwed from BOOK natural join COPY natural join BORROW natural join MEMBER where MEMBER.card_no = ? and (BORROW.paid = 0 or BORROW.paid is null) and BORROW.date_returned is null and BORROW.renewals_no = 2 and datediff(NOW(), BORROW.date_borrowed) > 42)) sel");)
+								{
+									try
+									{
+										//Take Input
+										System.out.println("What is the card number of the Member?");
+										validate = sc.next();
+										pStmt.setString(1, validate);
+										pStmt.setString(2, validate);
+										pStmt.setString(3, validate);
+										//Execute Query
+										ResultSet rset = pStmt.executeQuery();
+										System.out.println("ISBN | Title | Barcode | Date Borrowed | Renewals | Money Owed");
+										while(rset.next())
+										{
+											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getTime(4) + " | " + rset.getString(5) + " | " + rset.getString(6));
+										}
+										System.out.println();
+										System.out.println();
+										//Close Results
+										rset.close();
+									}
+									catch(SQLException e)
+									{
+										
+									}
+									//Close PreparedStatement
+									pStmt.close();
+								}
+								catch(SQLException e)
+								{
+									e.printStackTrace();
+								}
 							break;
 							case "11":
 								
