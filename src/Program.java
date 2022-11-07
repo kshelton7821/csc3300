@@ -10,29 +10,32 @@ public class Program
 		try
 		{
 			//Initial Variables
-			boolean runAgain = true;
+			boolean runAgain = true, login = true;
 			Scanner sc = new Scanner(System.in);
 			String name, password, validate;
 			
 			//Take user login information
-			System.out.println("Hello user! Please enter your username: ");
-			name = sc.nextLine();
-			System.out.println("Hello " + name + ", please enter your password: ");
-			password = sc.nextLine();
-			System.out.println("You have entered:");
-			System.out.println("Name: " + name);
-			System.out.println("Password: " + password);
-			
-			System.out.println("Please enter Y/n: ");
-			validate = sc.next();
-			
-			//Validate Information
-			if(validate.equals("n") || validate.equals("N"))
+			do
 			{
-				//User entered wrong information, exit
-				sc.close();
-				System.exit(1);
-			}
+				System.out.println("Hello user! Please enter your username: ");
+				name = sc.nextLine();
+				System.out.println("Hello " + name + ", please enter your password: ");
+				password = sc.nextLine();
+				System.out.println("You have entered:");
+				System.out.println("Name: " + name);
+				System.out.println("Password: " + password);
+				
+				System.out.println("Please enter Y/n: ");
+				validate = sc.next();
+				
+				//Validate Information
+				if(validate.equals("Y") || validate.equals("y"))
+				{
+					//User entered wrong information
+					login = false;
+				}
+			} while (login);
+			
 
 			//Open Connection to DB
 			try
@@ -80,7 +83,7 @@ public class Program
 										System.out.println("ISBN | Title | Genre | Date Published | Publisher | Edition Number | Description");
 										while(rset.next())
 										{
-											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getTime(4) + " | " + rset.getString(5) + " | " + rset.getInt(6) + " | " + rset.getString(7));
+											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getDate(4) + " | " + rset.getString(5) + " | " + rset.getInt(6) + " | " + rset.getString(7));
 										}
 										System.out.println();
 										System.out.println();
@@ -105,12 +108,28 @@ public class Program
 								{
 									try 
 									{
-										//Take Input
-										System.out.println("What is the name of the book you would like to look up?");
-										sc.nextLine();
-										validate = sc.nextLine();
-										pStmt.setString(1, validate);
+										boolean run = true;
+										String helper;
+										do
+										{
+											//Take Input
+											System.out.println("What is the name of the book you would like to look up?");
+											sc.nextLine();
+											validate = sc.nextLine();
+											
+											//Validate
+											System.out.println("Book Name: " + validate);
+											System.out.println("Is this correct? (Y/n)");
+											helper = sc.next();
+											
+											if(helper.equals("Y") || helper.equals("y"))
+											{
+												run = false;
+											}
+										} while (run);
+										
 										//Execute Query
+										pStmt.setString(1, validate);
 										ResultSet rset = pStmt.executeQuery();
 										
 										//List Results
@@ -202,10 +221,25 @@ public class Program
 								{
 									try
 									{
-										//Take Input
-										System.out.println("Please Enter the Member Card ID you would like to search");
-										sc.nextLine();
-										validate = sc.nextLine();
+										boolean run = true;
+										String helper;
+										do
+										{
+											//Take Input
+											System.out.println("Please Enter the Member Card ID you would like to search");
+											validate = sc.next();
+											
+											//Validate
+											System.out.println("Member ID: " + validate);
+											System.out.println("Is this correct? (Y/n)");
+											helper = sc.next();
+											
+											if(helper.equals("Y") || helper.equals("y"))
+											{
+												run = false;
+											}
+										} while(run);
+
 										pStmt.setString(1, validate);
 										pStmt.setString(2, validate);
 										pStmt.setString(3, validate);
@@ -215,7 +249,7 @@ public class Program
 										System.out.println("ISBN | Title | Barcode | Date Borrowed | Renewals");
 										while(rset.next()) 
 										{
-											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getTime(4) + " | " + rset.getInt(5));
+											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getDate(4) + " | " + rset.getInt(5));
 										}
 										System.out.println();
 										System.out.println();
@@ -240,16 +274,31 @@ public class Program
 								{
 									try
 									{
-										String helper;
-										//Take Input
-										System.out.println("What is the Barcode of the Book to be updated?:");
-										validate = sc.next();
-										System.out.println("What is the Card Number of the Member?:");
-										helper = sc.next();
+										boolean run = false;
+										String helper, helper2;
+										do
+										{
+											//Take Input
+											System.out.println("What is the Card Number of the Member?:");
+											helper = sc.next();
+											System.out.println("What is the Barcode of the Book to be updated?:");
+											validate = sc.next();
+											
+											//Validate
+											System.out.println("Member ID: " + helper);
+											System.out.println("Barcode Number: " + validate);
+											System.out.println("Is this correct? (Y/n)");
+											helper2 = sc.next();
+											
+											if(helper2.equals("Y") || helper2.equals("y"))
+											{
+												run = false;
+											}
+										} while (run);
+
+										//Execute Update
 										pStmt.setString(1, validate);
 										pStmt.setString(2, helper);
-										
-										//Execute Update
 										pStmt.executeUpdate();
 										System.out.println("Update Sent, Row will be Udpated if Information Matches");
 										System.out.println();
@@ -273,24 +322,41 @@ public class Program
 								{
 									try 
 									{
-										String helper;
-										//Take input
-										System.out.println("What is the Card Number of the Member?");
-										validate = sc.next();
-										System.out.println("What is the Barcode of the Book being Checked Out?");
-										helper = sc.next();
+										boolean run = true;
+										String helper, helper2;
+										do
+										{
+											//Take input
+											System.out.println("What is the Card Number of the Member?");
+											validate = sc.next();
+											System.out.println("What is the Barcode of the Book being Checked Out?");
+											helper = sc.next();
+											
+											//Validate
+											System.out.println("Member ID: " + validate);
+											System.out.println("Barcode Number: " + helper);
+											System.out.println("Is this correct? (Y/n)");
+											helper2 = sc.next();
+											
+											if(helper2.equals("Y") || helper2.equals("y"))
+											{
+												run = false;
+											}
+										} while(run);
+
+										//Execute Insert
 										pStmt.setString(1, validate);
 										pStmt.setString(2, helper);
-										//Execute Insert
 										pStmt.executeUpdate();
 										System.out.println("Row Inserted");
-										System.out.println();
-										System.out.println();
+
 									}
 									catch(SQLException e)
 									{
 										System.out.println("Error Inserting Row: " + e.toString());
 									}
+									System.out.println();
+									System.out.println();
 									//Close PreparedStatement
 									pStmt.close();
 								}
@@ -305,24 +371,40 @@ public class Program
 								{
 									try 
 									{
-										String helper;
-										//Take Input
-										System.out.println("What is the Card Number of the Member?");
-										validate = sc.next();
-										System.out.println("What is the Barcode of the Book being Renewed?");
-										helper = sc.next();
+										boolean run = true;
+										String helper, helper2;
+										do
+										{
+											//Take Input
+											System.out.println("What is the Card Number of the Member?");
+											validate = sc.next();
+											System.out.println("What is the Barcode of the Book being Renewed?");
+											helper = sc.next();	
+											
+											//Validate
+											System.out.println("Member ID: " + validate);
+											System.out.println("Barcode Number: " + helper);
+											System.out.println("Is this correct? (Y/n)");
+											helper2 = sc.next();
+											
+											if(helper2.equals("Y") || helper2.equals("y"))
+											{
+												run = false;
+											}
+										} while (run);
+
+										//Execute Update
 										pStmt.setString(1, validate);
 										pStmt.setString(2, helper);
-										//Execute Update
 										pStmt.executeUpdate();
 										System.out.println("Update Sent, Row will be Udpated if Information Matches");
-										System.out.println();
-										System.out.println();
 									}
 									catch(SQLException e)
 									{
 										System.out.println("Error: " + e.toString());
 									}
+									System.out.println();
+									System.out.println();
 									//Close PreparedStatement
 									pStmt.close();
 								}
@@ -332,7 +414,58 @@ public class Program
 								}
 							break;
 							case "9":
-								//Simple 10
+								//Open PreparedStatement
+								try(PreparedStatement pStmt = conn.prepareStatement("select sel.card_no, sum(sel.MoneyOwed) as MoneyOwed from ((select MEMBER.card_no, (datediff(NOW(), BORROW.date_borrowed) - 14) * 0.25 as MoneyOwed from BOOK natural join COPY natural join BORROW natural join MEMBER where MEMBER.card_no = ? and (BORROW.paid = 0 or BORROW.paid is null) and BORROW.date_returned is null and BORROW.renewals_no = 0 and datediff(NOW(), BORROW.date_borrowed) > 14) union (select MEMBER.card_no, (datediff(NOW(), BORROW.date_borrowed) - 28) * 0.25 as MoneyOwed from BOOK natural join COPY natural join BORROW natural join MEMBER where MEMBER.card_no = ? and (BORROW.paid = 0 or BORROW.paid is null) and BORROW.date_returned is null and BORROW.renewals_no = 1 and datediff(NOW(), BORROW.date_borrowed) > 28) union (select MEMBER.card_no, (datediff(NOW(), BORROW.date_borrowed) - 42) * 0.25 as MoneyOwed from BOOK natural join COPY natural join BORROW natural join MEMBER where MEMBER.card_no = ? and (BORROW.paid = 0 or BORROW.paid is null) and BORROW.date_returned is null and BORROW.renewals_no = 2 and datediff(NOW(), BORROW.date_borrowed) > 42)) sel group by sel.card_no");)
+								{
+									try
+									{
+										//Take Input
+										boolean run = true;
+										String helper1;
+										do
+										{
+											System.out.println("What is the Member ID?");
+											validate = sc.next();
+											
+											//Validate
+											System.out.println("Member ID: " + validate);
+											System.out.println("Is this correct? (Y/n)");
+											helper1 = sc.next();
+											
+											if(helper1.equals("Y") || helper1.equals("y"))
+											{
+												run = false;
+											}
+										} while (run);
+										
+										//Execute Query
+										pStmt.setString(1, validate);
+										pStmt.setString(2, validate);
+										pStmt.setString(3, validate);
+										ResultSet rset = pStmt.executeQuery();
+										
+										//Print Results
+										System.out.println("Member ID | Total Owed to Library");
+										while(rset.next())
+										{
+											System.out.println(rset.getString(1)+ " | " + rset.getString(2));
+										}
+										//Close ResultSet
+										rset.close();
+									}
+									catch(SQLException e)
+									{
+										System.out.println("Error Retrieving Row: " + e.toString());
+									}
+									System.out.println();
+									System.out.println();
+									//Close PreparedStatement
+									pStmt.close();
+								}
+								catch(SQLException e)
+								{
+									e.printStackTrace();
+								}
 							break;
 							case "10":
 								//Open PreparedStatement
@@ -340,18 +473,35 @@ public class Program
 								{
 									try
 									{
-										//Take Input
-										System.out.println("What is the card number of the Member?");
-										validate = sc.next();
+										boolean run = true;
+										String helper;
+										do
+										{
+											//Take Input
+											System.out.println("What is the card number of the Member?");
+											validate = sc.next();
+											System.out.println("Member ID: " + validate);
+											System.out.println("Is this correct? (Y/n)");
+											helper = sc.next();
+											
+											//Validate
+											if(helper.equals("Y") || helper.equals("y"))
+											{
+												run = false;
+											}
+										} while (run);
+										
+										//Execute Query
 										pStmt.setString(1, validate);
 										pStmt.setString(2, validate);
 										pStmt.setString(3, validate);
-										//Execute Query
 										ResultSet rset = pStmt.executeQuery();
+										
+										//Print Results
 										System.out.println("ISBN | Title | Barcode | Date Borrowed | Renewals | Money Owed");
 										while(rset.next())
 										{
-											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getTime(4) + " | " + rset.getString(5) + " | " + rset.getString(6));
+											System.out.println(rset.getString(1) + " | " + rset.getString(2) + " | " + rset.getString(3) + " | " + rset.getDate(4) + " | " + rset.getString(5) + " | " + rset.getString(6));
 										}
 										System.out.println();
 										System.out.println();
@@ -362,6 +512,8 @@ public class Program
 									{
 										
 									}
+									System.out.println();
+									System.out.println();
 									//Close PreparedStatement
 									pStmt.close();
 								}
@@ -371,7 +523,53 @@ public class Program
 								}
 							break;
 							case "11":
-								
+								//Open PreparedStatement
+								try(PreparedStatement pStmt = conn.prepareStatement("update BORROW set paid = 1 where barcode = ? and (paid = 0 or paid is null) and date_borrowed in (select tOut from (select max(date_borrowed) as tOut from BORROW where card_no = ?) tRes)");)
+								{
+									try
+									{
+										boolean run = true;
+										String helper, helper2;
+										//Take Input
+										do
+										{
+											System.out.println("What is the Barcode of the Book?");
+											validate = sc.next();
+											System.out.println("What is the ID of the Member?");
+											helper = sc.next();
+											
+											//Verify
+											System.out.println("Barcode: " + validate);
+											System.out.println("Member ID: " + helper);
+											System.out.println("Is this correct? (Y/n)");
+											helper2 = sc.next();
+											
+											if(helper2.equals("Y") || helper2.equals("y"))
+											{
+												run = false;
+											}
+										} while (run);
+										
+										//Execute Update
+										pStmt.setString(1, validate);
+										pStmt.setString(2, helper);
+										pStmt.executeUpdate();
+										
+										System.out.println("Row Updated");
+									}
+									catch(Exception e)
+									{
+										System.out.println("Error Updating Row: " + e.toString());
+									}
+									//Close PreparedStatement
+									System.out.println();
+									System.out.println();
+									pStmt.close();
+								}
+								catch(SQLException e)
+								{
+									e.printStackTrace();
+								}
 							break;
 							case "12":
 								System.out.println("Exiting Program");
@@ -383,8 +581,7 @@ public class Program
 								System.out.println();
 							break;
 						}
-					}
-					while(runAgain);
+					} while(runAgain);
 					//Close Scanner
 					sc.close();
 					//Close Connection
